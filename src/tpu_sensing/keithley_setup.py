@@ -1,4 +1,4 @@
-from  KeithleyConnect import instrument_write
+from  tpu_sensing.keithley_connect import instrument_write
 
 
 """***************KEITHLEY SET UP***************"""

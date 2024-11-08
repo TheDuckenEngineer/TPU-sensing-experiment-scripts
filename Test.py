@@ -1,6 +1,6 @@
 """****************************Imports****************************"""
-from Functions import *
-from  KeithleyConnect import *; from KeithleySetup import *
+from tpu_sensing.functions import *
+from  tpu_sensing.keithley_connect import *; from tpu_sensing.keithley_setup import *
 
 """***************Connect to devices***************"""
 s, ser = DeviceConnect()

@@ -1,6 +1,6 @@
 """****************************Imports****************************"""
 import numpy as np; import time; import socket; import serial
-from  KeithleyConnect import *; from KeithleySetup import *
+from  tpu_sensing.keithley_connect import *; from tpu_sensing.keithley_setup import *
 from time import perf_counter_ns; import os.path
 
 
@@ -14,7 +14,7 @@ def DeviceConnect():
     instrument_connect(s, ip_address, my_port, 10000)
 
     # connect to the 3d printer
-    ser = serial.Serial('COM5', 250000, timeout = 1)
+    ser = serial.Serial('COM3', 250000, timeout = 1)
     time.sleep(1)
     return s, ser
 
