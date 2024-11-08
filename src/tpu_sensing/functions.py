@@ -111,7 +111,7 @@ def Heater(t, ser):
                     break
 
 
-def Experiment(s, ser, stepSize, maxStrain, temperatureList, testTime):
+def Experiment(s, ser, stepSize, maxStrain, diameter, temperatureList, testTime):
     """***************Test parameters***************"""
     # input the gel type and its plasticizer content
     print('List the gel type and plasticizer content\n Ex: PVC P2')
@@ -139,7 +139,7 @@ def Experiment(s, ser, stepSize, maxStrain, temperatureList, testTime):
     Data = np.zeros([0, 7])
     for t in temperatureList:
         # heat the bed to the target temp then find the gel
-        # Heater(t, ser)
+        # Heater(t, ser)    # uncomment to start using the heater
         GelFinder(s, ser)
 
 
@@ -220,18 +220,18 @@ def Experiment(s, ser, stepSize, maxStrain, temperatureList, testTime):
                           bufferData[:tempDataLimit, 2], bufferData[:tempDataLimit, 3]]).T
         Data = np.vstack([Data, data])
         
-    # apply the load cell resolution
-    Data[:, -3] = 28822*Data[:, -3] + 915.55
-    info = f'Gel thickness: {thickness}, Step incrament: {stepSize}, Max Strain: {maxStrain}, Step time: {testTime}'
+    # apply the load cell resolution calibration with g converted to kg and diameter to area in m^2
+    Data[:, -3] = 9.81*(28822*Data[:, -3] + 915.55)*1000/(np.power(diameter/1000, 2)*np.pi/4)
+    info = f'Gel thickness: {thickness}, Step incrament: {stepSize}, Max Strain: {maxStrain}, Step time: {testTime}, Diameter: {diameter}'
     return parameters, Data, info
 
 
 def DataExport(params, Data, info):
     fileName = f'{params}'
     if os.path.isfile(fileName) == 0:
-        np.savetxt(f"Data/{fileName}.csv", Data, header = 'Position (mm), Strain (mm/mm), Temperature (C), Time, Load cell (g), Time (s), Voltage (V)', delimiter = ",",
+        np.savetxt(f"Data/{fileName}.csv", Data, header = 'Position (mm), Strain (mm/mm), Temperature (C), Time, Stress (Pa), Time (s), Voltage (V)', delimiter = ",",
                    fmt = "%f", comments = f'{info}\n\n')
     elif os.path.isfile(fileName) == 1:
         os.remove(fileName)
-        np.savetxt(f"Data/{fileName}.csv", Data, header = 'Position (mm), Strain (mm/mm), Temperature (C), Time, Load cell (g), Time (s), Voltage (V)', delimiter = ",",
+        np.savetxt(f"Data/{fileName}.csv", Data, header = 'Position (mm), Strain (mm/mm), Temperature (C), Time, Stress (Pa), Time (s), Voltage (V)', delimiter = ",",
                    fmt = "%f", comments = f'{info}\n\n')
