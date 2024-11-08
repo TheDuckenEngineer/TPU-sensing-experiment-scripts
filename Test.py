@@ -1,6 +1,6 @@
 """****************************Imports****************************"""
-from Functions import *
-from  KeithleyConnect import *; from KeithleySetup import *
+from tpu_sensing.functions import *
+from  tpu_sensing.keithley_connect import *; from tpu_sensing.keithley_setup import *
 
 """***************Connect to devices***************"""
 s, ser = DeviceConnect()
@@ -11,12 +11,11 @@ try:
     # s is the Keithley socket connection
     # ser is the serial connection to the motherboard
     # stepSize is the actuators incremental displacement (mm)
-    # maxStrain is the maximum desired strain (%). it's a function of the gel thickness
-    # diameter is the gel diameter based on the punch used (mm)
-    # temperatureList is the desired temperatures in a list form (C). currently set to no heating so put one element in the list
+    # maxStrain is the maximum desired strain (%). it's a function of the gel thickness 
+    # temperatureList is the desired temperatures in a list form (C)
     # testTime is how long to record data at each displacement (s)
-    params, Data, info = Experiment(s, ser, stepSize = 0.02, maxStrain = 5, diameter = 20,
-                                    temperatureList = [22], testTime = 30)
+    params, Data, info = Experiment(s, ser, stepSize = 0.02, maxStrain = 15, 
+                                    temperatureList = [24], testTime = 120)
 
 
     """*******************Data export*******************"""

@@ -1,0 +1,18 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tpu-sensing"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "barbozaz", email = "barbozaz@unlv.nevada.edu" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "ipykernel>=6.29.5",
+    "numpy>=2.1.2",
+    "pyserial>=3.5",
+]
