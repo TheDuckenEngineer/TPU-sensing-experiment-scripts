@@ -204,8 +204,9 @@ def Experiment(s, ser, stepSize, maxStrain, diameter, temperatureList, testTime)
         print('Reading buffer\n')
         for i in range(1, bufferInitial + 1):
             # read the measurements and their realtive times
-            buffer = np.hstack([buffer, float(np.array(instrument_query(s, f"TRACe:DATA? {i}, {i}, \"Sensing\", READ", 16*bufferSize).split(',')))])
-            bufferTimes = np.hstack([bufferTimes, float(np.array(instrument_query(s, f"TRACe:DATA? {i}, {i}, \"Sensing\", REL", 16*bufferSize).split(',')))])
+            measurement = np.array(instrument_query(s, f"TRACe:DATA? {i}, {i}, \"Sensing\", REL, READ", 16*bufferSize).split(','))
+            bufferTimes = np.hstack([bufferTimes, float(measurement[0])])
+            buffer = np.hstack([buffer, float(measurement[1])])
         bufferData = np.vstack([bufferTimes, buffer]).T.reshape(int(len(buffer)/numberOfChannels),2*numberOfChannels)
         
         # correlate the temperature times from the buffer to the temperature using floor using two
