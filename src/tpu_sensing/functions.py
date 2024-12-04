@@ -11,7 +11,7 @@ def DeviceConnect():
 
     # establish connection to the LAN socket. initialize and connect to the Keithley
     s = socket.socket() # Establish a TCP/IP socket object
-    instrument_connect(s, ip_address, my_port, 10000)
+    InstrumentConnect(s, ip_address, my_port, 10000)
 
     # connect to the 3d printer
     ser = serial.Serial('COM3', 250000, timeout = 1)
@@ -59,13 +59,13 @@ def GelFinder(s, ser):
     i = 1
 
     # begin data collection
-    instrument_write(s,"INIT")
+    InstrumentWrite(s,"INIT")
     time.sleep(0.25)
     print('Position, Termination Criteria, Load cell')
 
     # make larger steps
     while True:
-        bufferSize = int(instrument_query(s, "TRACe:ACTual? \"Sensing\"", 16).rstrip())
+        bufferSize = int(InstrumentQuery(s, "TRACe:ACTual? \"Sensing\"", 16).rstrip())
         
         # let the buffer get to 100 data points. if the buffer isn't large enough, pass
         if bufferSize <= 100:
@@ -73,8 +73,8 @@ def GelFinder(s, ser):
         elif bufferSize > 100:
                 # read the buffer value and the average
                 time.sleep(0.025)
-                buffer = float(instrument_query(s, f"TRACe:DATA? {bufferSize}, {bufferSize}, \"Sensing\", READ", 16).split(',')[0])
-                bufferAverage = float(instrument_query(s, "TRACe:STATistics:AVERage? \"Sensing\"", 16))
+                buffer = float(InstrumentQuery(s, f"TRACe:DATA? {bufferSize}, {bufferSize}, \"Sensing\", READ", 16).split(',')[0])
+                bufferAverage = float(InstrumentQuery(s, "TRACe:STATistics:AVERage? \"Sensing\"", 16))
                 print(np.round(position, 3), np.round(bufferAverage, 6), buffer)
                 
                 # termination is when the load cell sees variance above the average. at termination, the actuator
@@ -92,7 +92,7 @@ def GelFinder(s, ser):
     # stop the instrument and set axis to zero
     print(' \n')
     PrintCommand(ser,'G92 Z0 \n')
-    instrument_write(s,"ABORT")
+    InstrumentWrite(s,"ABORT")
 
 
 def Heater(t, ser):
@@ -162,7 +162,7 @@ def Experiment(s, ser, stepSize, maxStrain, diameter, temperatureList, testTime)
         DcVoltSetup(s, channels)
     
         # begin data collection
-        instrument_write(s, "INIT")
+        InstrumentWrite(s, "INIT")
         time.sleep(0.2)
         
         for x in range(0, yLength):
@@ -182,7 +182,7 @@ def Experiment(s, ser, stepSize, maxStrain, diameter, temperatureList, testTime)
 
             # stop the Keithley at an integer value of the data collected
             while True:
-                bufferSize = int(instrument_query(s, "TRACe:ACTual:END? \"Sensing\"", 16).rstrip())
+                bufferSize = int(InstrumentQuery(s, "TRACe:ACTual:END? \"Sensing\"", 16).rstrip())
                 if bufferSize % numberOfChannels == 0:
                     # index the buffer the the inital position to the current position
                     points = np.ones(int((bufferSize - bufferInitial)/numberOfChannels))
@@ -194,7 +194,7 @@ def Experiment(s, ser, stepSize, maxStrain, diameter, temperatureList, testTime)
                     pass
 
         # stop the Keithley
-        instrument_write(s, "ABORT")
+        InstrumentWrite(s, "ABORT")
 
         # reset the initial position
         PrintCommand(ser,'G1 Z0.25\n')
@@ -204,7 +204,7 @@ def Experiment(s, ser, stepSize, maxStrain, diameter, temperatureList, testTime)
         print('Reading buffer\n')
         for i in range(1, bufferInitial + 1):
             # read the measurements and their realtive times
-            measurement = np.array(instrument_query(s, f"TRACe:DATA? {i}, {i}, \"Sensing\", REL, READ", 16*bufferSize).split(','))
+            measurement = np.array(InstrumentQuery(s, f"TRACe:DATA? {i}, {i}, \"Sensing\", REL, READ", 16*bufferSize).split(','))
             bufferTimes = np.hstack([bufferTimes, float(measurement[0])])
             buffer = np.hstack([buffer, float(measurement[1])])
         bufferData = np.vstack([bufferTimes, buffer]).T.reshape(int(len(buffer)/numberOfChannels),2*numberOfChannels)

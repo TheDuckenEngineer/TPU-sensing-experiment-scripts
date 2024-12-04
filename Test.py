@@ -28,7 +28,7 @@ try:
     PrintCommand(ser, 'M140 S20 \n')
 
 except KeyboardInterrupt:
-    instrument_write(s, "ABORT")
+    InstrumentWrite(s, "ABORT")
     print('\nTest aborted')
     PrintCommand(ser, 'G1 Z10\n')
     PrintCommand(ser, 'M140 S20 \n')
