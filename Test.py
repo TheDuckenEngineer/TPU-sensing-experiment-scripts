@@ -15,8 +15,8 @@ try:
     # diameter is the gel diameter based on the punch used (mm)
     # temperatureList is the desired temperatures in a list form (C). currently set to no heating so put one element in the list
     # testTime is how long to record data at each displacement (s)
-    params, Data, info = Experiment(s, ser, stepSize = 0.02, maxStrain = 5, diameter = 20,
-                                    temperatureList = [22], testTime = 30)
+    params, Data, info = Experiment(s, ser, stepSize = 0.02, maxStrain = 10, diameter = 12,
+                                    temperatureList = [50], testTime = 60)
 
 
     """*******************Data export*******************"""

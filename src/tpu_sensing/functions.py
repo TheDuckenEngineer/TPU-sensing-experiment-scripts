@@ -14,7 +14,7 @@ def DeviceConnect():
     InstrumentConnect(s, ip_address, my_port, 10000)
 
     # connect to the 3d printer
-    ser = serial.Serial('COM3', 250000, timeout = 1)
+    ser = serial.Serial('COM5', 250000, timeout = 1)
     time.sleep(1)
     return s, ser
 
@@ -139,7 +139,7 @@ def Experiment(s, ser, stepSize, maxStrain, diameter, temperatureList, testTime)
     Data = np.zeros([0, 7])
     for t in temperatureList:
         # heat the bed to the target temp then find the gel
-        # Heater(t, ser)    # uncomment to start using the heater
+        Heater(t, ser)    # uncomment to start using the heater
         GelFinder(s, ser)
 
 
@@ -230,9 +230,9 @@ def Experiment(s, ser, stepSize, maxStrain, diameter, temperatureList, testTime)
 def DataExport(params, Data, info):
     fileName = f'{params}'
     if os.path.isfile(fileName) == 0:
-        np.savetxt(f"Data/{fileName}.csv", Data, header = 'Position (mm), Strain (mm/mm), Temperature (C), Time, Stress (Pa), Time (s), Voltage (V)', delimiter = ",",
+        np.savetxt(f"Data/{fileName}.csv", Data, header = 'Position (mm), Strain (mm/mm), Temperature (C), Stress Time (s), Stress (Pa), Volt Time (s), Voltage (V)', delimiter = ",",
                    fmt = "%f", comments = f'{info}\n\n')
     elif os.path.isfile(fileName) == 1:
         os.remove(fileName)
-        np.savetxt(f"Data/{fileName}.csv", Data, header = 'Position (mm), Strain (mm/mm), Temperature (C), Time, Stress (Pa), Time (s), Voltage (V)', delimiter = ",",
+        np.savetxt(f"Data/{fileName}.csv", Data, header = 'Position (mm), Strain (mm/mm), Temperature (C), Stress Time (s), Stress (Pa), Volt Time (s), Voltage (V)', delimiter = ",",
                    fmt = "%f", comments = f'{info}\n\n')
