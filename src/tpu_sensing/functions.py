@@ -139,7 +139,7 @@ def Experiment(s, ser, stepSize, maxStrain, diameter, temperatureList, testTime)
     Data = np.zeros([0, 7])
     for t in temperatureList:
         # heat the bed to the target temp then find the gel
-        Heater(t, ser)    # uncomment to start using the heater
+        # Heater(t, ser)    # uncomment to start using the heater
         GelFinder(s, ser)
 
 
