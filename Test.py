@@ -17,8 +17,8 @@ try:
     # testTime is how long to record data at each displacement (s)
         # if you want to perform a single large step, the single step must fall between 50% - 150% 
         # singleStep = maxStrain*thickness/stepSize (already in %)
-    params, Data, info = Experiment(s, ser, stepSize = 0.02, maxStrain = 10, diameter = 12,
-                                    temperatureList = [50], testTime = 60)
+    params, Data, info = Experiment(s, ser, stepSize = 0.02, maxStrain = 20, diameter = 12,
+                                    temperatureList = [22], testTime = 100)
 
 
     """*******************Data export*******************"""

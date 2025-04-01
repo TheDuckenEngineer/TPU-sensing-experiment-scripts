@@ -67,10 +67,10 @@ def GelFinder(s, ser):
     while True:
         bufferSize = int(InstrumentQuery(s, "TRACe:ACTual? \"Sensing\"", 16).rstrip())
         
-        # let the buffer get to 100 data points. if the buffer isn't large enough, pass
-        if bufferSize <= 100:
+        # let the buffer get to 200 data points. if the buffer isn't large enough, pass
+        if bufferSize <= 200:
             pass    
-        elif bufferSize > 100:
+        elif bufferSize > 200:
                 # read the buffer value and the average
                 time.sleep(0.025)
                 buffer = float(InstrumentQuery(s, f"TRACe:DATA? {bufferSize}, {bufferSize}, \"Sensing\", READ", 16).split(',')[0])
@@ -79,7 +79,7 @@ def GelFinder(s, ser):
                 
                 # termination is when the load cell sees variance above the average. at termination, the actuator
                 # moves back one step. future steps are cut in half. this is occurs two times before reaching zero. 
-                if np.abs(bufferAverage - buffer) >= 0.00005:
+                if np.abs(bufferAverage - buffer) >= 0.00009:
                     position += 0.020
                     PrintCommand(ser,f'G1 Z{position} \n')
                     i += 1
@@ -124,7 +124,8 @@ def Experiment(s, ser, stepSize, maxStrain, diameter, temperatureList, testTime)
     totalTravel = np.round(maxStrain/100*thickness/stepSize)*stepSize # mm
 
     # preallocate gantry movement
-    yMotion = np.around(np.concatenate([np.arange(0, -totalTravel, -stepSize), np.arange(-totalTravel, 0 + stepSize, stepSize)]), 2)
+    yMotion = np.around(np.arange(0, -totalTravel, -stepSize), 2)
+    # for stepping down and up -- np.concatenate([np.arange(0, -totalTravel, -stepSize), np.arange(-totalTravel, 0 + stepSize, stepSize)]
     yLength = len(yMotion)
 
 
@@ -141,6 +142,7 @@ def Experiment(s, ser, stepSize, maxStrain, diameter, temperatureList, testTime)
         # heat the bed to the target temp then find the gel
         # Heater(t, ser)    # uncomment to start using the heater
         GelFinder(s, ser)
+        time.sleep(2)
 
 
         """***********************Data matrices***********************"""
@@ -197,8 +199,7 @@ def Experiment(s, ser, stepSize, maxStrain, diameter, temperatureList, testTime)
         InstrumentWrite(s, "ABORT")
 
         # reset the initial position
-        PrintCommand(ser,'G1 Z0.25\n')
-        PrintCommand(ser,'G92 Z0\n')
+        PrintCommand(ser,'G1 Z2\n')
 
         # collect the data from the buffer
         print('Reading buffer\n')
@@ -221,8 +222,8 @@ def Experiment(s, ser, stepSize, maxStrain, diameter, temperatureList, testTime)
                           bufferData[:tempDataLimit, 2], bufferData[:tempDataLimit, 3]]).T
         Data = np.vstack([Data, data])
         
-    # apply the load cell resolution calibration with g converted to kg and diameter to area in m^2
-    Data[:, -3] = 9.81*(28822*Data[:, -3] + 915.55)*1000/(np.power(diameter/1000, 2)*np.pi/4)
+    # apply the load cell resolution calibration with force calibration and diameter to area in m^2
+    Data[:, -3] = (181.03*Data[:, -3] + 5.830568)/(np.power(diameter/1000, 2)*np.pi/4)
     info = f'Gel thickness: {thickness}, Step incrament: {stepSize}, Max Strain: {maxStrain}, Step time: {testTime}, Diameter: {diameter}'
     return parameters, Data, info
 
